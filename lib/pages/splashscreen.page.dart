@@ -59,6 +59,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
     _firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
           print("onMessage: $message");
+          _backgroundMessageHandler(message)
         },
         onBackgroundMessage: _backgroundMessageHandler,
         onLaunch: (Map<String, dynamic> message) async {
