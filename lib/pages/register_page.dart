@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,46 +25,51 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void validation() {
     if (nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Name is Empty."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Name is Empty."),
+      //   ),
+      // );
+      log('log : Name is Empty.');
       return;
     }
 
     if (emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Email is Empty."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Email is Empty."),
+      //   ),
+      // );
+      log('log : Email is Empty.');
       return;
     } else if (!regExp.hasMatch(emailController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please enter valid email."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter valid email."),
+      //   ),
+      // );
+      log('log : Please enter valid email.');
       return;
     }
 
     if (passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Password is empty.'),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Password is empty.'),
+      //   ),
+      // );
+      log('log : Password is empty.');
       return;
     }
 
     if (confirmPassController.text.trim() != passwordController.text.trim()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Password do not match."),
-        ),
-      );
-      return;
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Password do not match."),
+      //   ),
+      // );
+      // return;
+      log('log : Password do not match.');
     } else {
       sendData();
     }
@@ -88,18 +95,24 @@ class _RegisterPageState extends State<RegisterPage> {
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('The password provided is too weak.'),
-        ));
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Text('The password provided is too weak.'),
+        // ));
+        log('firebase-exc: ${e.code}');
       } else if (e.code == 'email-already-in-use') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('The account already exists for that email.'),
-        ));
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Text('The account already exists for that email.'),
+        // ));
       }
+      log('firebase-exc: ${e.code}');
+
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(e),
-      ));
+
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //   content: Text(e),
+      // ));
+      log('firebase-exc: ${e.code}');
+
     }
     await Token.updateToken();
   }

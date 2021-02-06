@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,26 +21,29 @@ class _LoginPageState extends State<LoginPage> {
 
   void validation() {
     if (emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Email is Empty."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Email is Empty."),
+      //   ),
+      // );
+      log('log : Email is Empty.');
       return;
     } else if (!regExp.hasMatch(emailController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please enter valid email."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter valid email."),
+      //   ),
+      // );
+      log('log : Please enter valid email.');
       return;
     }
     if (passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Password is empty."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Password is empty."),
+      //   ),
+      // );
+      log('log : Password is empty..');
       return;
     } else {
       loginAuth();
@@ -51,18 +56,20 @@ class _LoginPageState extends State<LoginPage> {
           email: emailController.text, password: passwordController.text);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("No user found for that email."),
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text("No user found for that email."),
+        //   ),
+        // );
+        log('log : No user found for that email.');
         return;
       } else if (e.code == 'wrong-password') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Wrong password provided for that user."),
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text("Wrong password provided for that user."),
+        //   ),
+        // );
+        log('log : Wrong password provided for that user.');
         return;
       }
     }

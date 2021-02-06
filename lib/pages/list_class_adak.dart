@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -56,14 +58,14 @@ class _ListClassAdakState extends State<ListClassAdak> {
                             DropdownButton(
                               items: currencyItems,
                               onChanged: (currencyValue) {
-                                final snackBar = SnackBar(
-                                  content: Text(
-                                    'Mata kuliah yang dipilih $currencyValue',
-                                    style: TextStyle(fontSize: 18.0),
-                                  ),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                // final snackBar = SnackBar(
+                                //   content: Text(
+                                //     'Mata kuliah yang dipilih $currencyValue',
+                                //     style: TextStyle(fontSize: 18.0),
+                                //   ),
+                                // );
+                                // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                log('log : Mata kuliah yang dipilih $currencyValue');
                                 setState(() {
                                   selectedCurrency = currencyValue;
                                 });

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
@@ -26,36 +27,40 @@ class _MakeAgendaState extends State<MakeAgenda> {
 
   void validation() {
     if (kelasController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Kelas tidak boleh kosong."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Kelas tidak boleh kosong."),
+      //   ),
+      // );
+      log('log : Kelas tidak boleh kosong.');
       return;
     }
 
     if (ruanganController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Ruangan tidak boleh kosong."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Ruangan tidak boleh kosong."),
+      //   ),
+      // );
+      log('log : Kelas tidak boleh kosong.');
       return;
     }
     if (jamController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Jam tidak boleh kosong.'),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Jam tidak boleh kosong.'),
+      //   ),
+      // );
+      log('log : Jam tidak boleh kosong.');
       return;
     }
     if (keteranganController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Keterangan tidak boleh kosong.'),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Keterangan tidak boleh kosong.'),
+      //   ),
+      // );
+      log('log : Keterangan tidak boleh kosong.');
       return;
     } else {
       sendAgenda();
@@ -185,14 +190,14 @@ class _MakeAgendaState extends State<MakeAgenda> {
                             DropdownButton(
                               items: currencyItems,
                               onChanged: (currencyValue) {
-                                final snackBar = SnackBar(
-                                  content: Text(
-                                    'Mata kuliah yang dipilih $currencyValue',
-                                    style: TextStyle(fontSize: 18.0),
-                                  ),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                // final snackBar = SnackBar(
+                                //   content: Text(
+                                //     'Mata kuliah yang dipilih $currencyValue',
+                                //     style: TextStyle(fontSize: 18.0),
+                                //   ),
+                                // );
+                                // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                log('log : Mata kuliah yang dipilih $currencyValue');
                                 setState(() {
                                   selectedCurrency = currencyValue;
                                 });

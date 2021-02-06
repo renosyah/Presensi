@@ -43,8 +43,7 @@ class MainPage extends StatelessWidget {
                   .collection('userDatas')
                   .doc(snapshot.data.uid)
                   .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+              builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
                 if (snapshot.hasData) {
                   final user = snapshot.data.data();
 
