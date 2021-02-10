@@ -9,9 +9,22 @@ class ListClassAdak extends StatefulWidget {
 }
 
 class _ListClassAdakState extends State<ListClassAdak> {
-  var selectedCurrency, selectedType;
-  String waktu;
-  int n = 15;
+
+  Stream<QuerySnapshot> _presensi,_makul;
+  var _selectedMakul;
+
+  @override
+  void initState() {
+    super.initState();
+    _presensi = FirebaseFirestore.instance
+        .collection('presensi')
+        .snapshots();
+
+    _makul = FirebaseFirestore.instance
+        .collection("mataKuliah")
+        .snapshots();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -30,9 +43,7 @@ class _ListClassAdakState extends State<ListClassAdak> {
               Align(
                 alignment: Alignment.topLeft,
                 child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection("mataKuliah")
-                        .snapshots(),
+                    stream: _makul,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData)
                         Text("Loading.....");
@@ -67,10 +78,10 @@ class _ListClassAdakState extends State<ListClassAdak> {
                                 // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                 log('log : Mata kuliah yang dipilih $currencyValue');
                                 setState(() {
-                                  selectedCurrency = currencyValue;
+                                  _selectedMakul = currencyValue;
                                 });
                               },
-                              value: selectedCurrency,
+                              value: _selectedMakul,
                               isExpanded: false,
                               hint: new Text(
                                 "Pilih",
@@ -82,56 +93,49 @@ class _ListClassAdakState extends State<ListClassAdak> {
                       }
                       return Container();
                     }),
-              ),
-              DataTable(columns: <DataColumn>[
-                DataColumn(
-                    label: Text(
-                  'No',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Waktu',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Hadir',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Alpha',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                )),
-                DataColumn(
-                    label: Text(
-                  'Izin',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                )),
-              ], rows: <DataRow>[
-                DataRow(cells: <DataCell>[
-                  DataCell(
-                    StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('presensi')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData)
-                          Text("Loading.....");
-                        else {
-                          List<Widget> noItem = [];
-                          for (int i = 1; i < snapshot.data.docs.length; i++) {
-                            DocumentSnapshot snap = snapshot.data.docs[i];
-                            noItem.add(Text(snap.data()[i]));
-                          }
-                        }
-                        return Container();
-                      },
-                    ),
-                  ),
-                ])
-              ]),
+              ),StreamBuilder<QuerySnapshot>(
+                  stream: _presensi,
+                  builder: (context, snapshot) {
+                    List<DataRow> noItem = [];
+                    if (snapshot.hasData){
+                      log("${snapshot.data.docs.toString()}");
+                      int no = 1;
+                      for (DocumentSnapshot snap in snapshot.data.docs) {
+                        noItem.add(DataRow(
+                            cells: <DataCell>[
+                              DataCell(Text("${no}")),
+                              DataCell(Text("${snap.id}")),
+                              DataCell(Text("${snap.data()['presensi'].toDate()}"))
+                            ])
+                        );
+                        no++;
+                      }
+                    }
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(columns: <DataColumn>[
+                            DataColumn(
+                            label: Text(
+                              'No',
+                              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                            ),
+                            DataColumn(
+                            label: Text(
+                            ' Id',
+                              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                            ),
+                            DataColumn(
+                            label: Text(
+                              'Waktu',
+                              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                            )
+                          ],rows: noItem)
+                        )
+                    );
+                  }
+              )
             ],
           )
         ],
