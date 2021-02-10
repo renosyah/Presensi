@@ -3,6 +3,8 @@ import 'package:mypresensi/pages/account.dart';
 import 'package:mypresensi/pages/home_page_dosen.dart';
 import 'package:mypresensi/pages/listClass.dart';
 
+import 'listAgenda.dart';
+
 
 class DosenController extends StatefulWidget {
   @override
@@ -51,11 +53,11 @@ class _DosenControllerState extends State<DosenController> {
                 Icons.list_alt_outlined,
                 color: _selectedIndex == 1 ? Colors.blue[600] : Colors.grey,
               ),
-              label: 'List Class'),
+              label: 'Class'),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,
-                color: _selectedIndex == 2 ? Colors.blue[600] : Colors.grey,
+                color: _selectedIndex == 3 ? Colors.blue[600] : Colors.grey,
               ),
               label: 'Account'),
         ],

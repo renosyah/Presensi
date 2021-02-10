@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:uuid/uuid.dart' as uuid;
+import 'package:uuid/uuid_util.dart';
 
 class MakeClass extends StatefulWidget {
   MakeClass({Key key}) : super(key: key);
@@ -15,22 +16,23 @@ class MakeClass extends StatefulWidget {
 class _MakeClassState extends State<MakeClass> {
   TextEditingController _classController = TextEditingController();
 
-  String data;
-  String qrData = "No Data Found";
-  bool hasdata = false;
+  String _className;
+  String _qrCode;
+
+  @override
+  void initState() {
+    super.initState();
+    _qrCode = uuid.Uuid().v4(options: {'rng': UuidUtil.cryptoRNG});
+  }
 
   createClass() async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-
     String deviceId;
-
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
     Map<String, dynamic> deviceData;
 
     if (Platform.isAndroid) {
       final deviceInfo = await deviceInfoPlugin.androidInfo;
-
       deviceId = deviceInfo.androidId;
       deviceData = {
         'device': deviceInfo.device,
@@ -38,10 +40,8 @@ class _MakeClassState extends State<MakeClass> {
         'model': deviceInfo.model,
         'platform': 'android',
       };
-    }
-    if (Platform.isIOS) {
+    } else  if (Platform.isIOS) {
       final deviceInfo = await deviceInfoPlugin.iosInfo;
-
       deviceId = deviceInfo.identifierForVendor;
       deviceData = {
         'device': deviceInfo.name,
@@ -52,22 +52,17 @@ class _MakeClassState extends State<MakeClass> {
     }
 
     final nowMs = DateTime.now();
+    final kelasRef = _firestore.collection('kelas').doc();
 
-    final kelasRef = _firestore.collection('mataKuliah').doc();
+    await kelasRef.set({
+      'nama' : _className,
+      'qrcode' : _qrCode,
+      'created_at': nowMs,
+      'updated_at': nowMs,
+      'id': deviceId,
+      'device info': deviceData,
+    });
 
-    if ((await kelasRef.get()).exists) {
-      await kelasRef.update({
-        'update_at': nowMs,
-      });
-    } else {
-      await kelasRef.set({
-        'mata_kuliah': data,
-        'created_at': nowMs,
-        'updated_at': nowMs,
-        'id': deviceId,
-        'device info': deviceData,
-      });
-    }
   }
 
   @override
@@ -86,39 +81,11 @@ class _MakeClassState extends State<MakeClass> {
             children: [
               SizedBox(height: 50.0),
               Center(
-                child: QrImage(
-                  data: '$data',
-                  version: QrVersions.auto,
-                  size: 200.0,
-                  gapless: false,
-                ),
+                child: Image.asset('images/class.png'),
               ),
               SizedBox(
                 height: 20.0,
               ),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     Flexible(
-              //       child: Text(
-              //         'Link  : ${(qrData)}',
-              //         textAlign: TextAlign.center,
-              //         style: TextStyle(fontSize: 20.0),
-              //       ),
-              //     ),
-              //     IconButton(
-              //         icon: Icon(Icons.launch_outlined),
-              //         onPressed: hasdata
-              //             ? () async {
-              //                 if (await canLaunch(qrData)) {
-              //                   await launch(qrData);
-              //                 } else {
-              //                   throw "Couldn't launch";
-              //                 }
-              //               }
-              //             : null)
-              //   ],
-              // ),
               Container(
                 height: 50.0,
                 width: 350.0,
@@ -143,7 +110,7 @@ class _MakeClassState extends State<MakeClass> {
                               color: Colors.black,
                             ),
                           ),
-                          hintText: 'Enter Class',
+                          hintText: 'Class Name',
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           enabledBorder: InputBorder.none,
@@ -167,7 +134,7 @@ class _MakeClassState extends State<MakeClass> {
                 child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        data = _classController.text;
+                        _className = _classController.text;
                         createClass();
                       });
                     },

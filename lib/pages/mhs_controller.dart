@@ -51,7 +51,7 @@ class _MahasiswaControllerState extends State<MahasiswaController> {
                 Icons.list_alt_outlined,
                 color: _selectedIndex == 1 ? Colors.blue[600] : Colors.grey,
               ),
-              label: 'List Class'),
+              label: 'Presents'),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,

@@ -33,67 +33,60 @@ class _ListClassAdakState extends State<ListClassAdak> {
         children: <Widget>[
           Column(
             children: [
-              Align(
-                child: Text(
-                  "Pilih Mata Kuliah",
-                  style: TextStyle(fontSize: 18.0),
-                ),
-                alignment: Alignment.topLeft,
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: _makul,
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData)
-                        Text("Loading.....");
-                      else {
-                        List<DropdownMenuItem> currencyItems = [];
-                        for (int i = 0; i < snapshot.data.docs.length; i++) {
-                          DocumentSnapshot snap = snapshot.data.docs[i];
-                          currencyItems.add(
-                            DropdownMenuItem(
-                              child: Text(
-                                snap.data()['mata_kuliah'],
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              value: "${snap.data()['mata_kuliah']}",
-                            ),
-                          );
-                        }
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(width: 50.0),
-                            DropdownButton(
-                              items: currencyItems,
-                              onChanged: (currencyValue) {
-                                // final snackBar = SnackBar(
-                                //   content: Text(
-                                //     'Mata kuliah yang dipilih $currencyValue',
-                                //     style: TextStyle(fontSize: 18.0),
-                                //   ),
-                                // );
-                                // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                log('log : Mata kuliah yang dipilih $currencyValue');
-                                setState(() {
-                                  _selectedMakul = currencyValue;
-                                });
-                              },
-                              value: _selectedMakul,
-                              isExpanded: false,
-                              hint: new Text(
-                                "Pilih",
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                      return Container();
-                    }),
-              ),StreamBuilder<QuerySnapshot>(
+              // Align(
+              //   child: Text(
+              //     "Pilih Mata Kuliah",
+              //     style: TextStyle(fontSize: 18.0),
+              //   ),
+              //   alignment: Alignment.topLeft,
+              // ),
+              // Align(
+              //   alignment: Alignment.topLeft,
+              //   child: StreamBuilder<QuerySnapshot>(
+              //       stream: _makul,
+              //       builder: (context, snapshot) {
+              //         if (!snapshot.hasData)
+              //           Text("Loading.....");
+              //         else {
+              //           List<DropdownMenuItem> currencyItems = [];
+              //           for (int i = 0; i < snapshot.data.docs.length; i++) {
+              //             DocumentSnapshot snap = snapshot.data.docs[i];
+              //             currencyItems.add(
+              //               DropdownMenuItem(
+              //                 child: Text(
+              //                   snap.data()['mata_kuliah'],
+              //                   style: TextStyle(fontSize: 18.0),
+              //                 ),
+              //                 value: "${snap.id}",
+              //               ),
+              //             );
+              //           }
+              //           return Column(
+              //             mainAxisAlignment: MainAxisAlignment.start,
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: <Widget>[
+              //               SizedBox(width: 50.0),
+              //               DropdownButton(
+              //                 items: currencyItems,
+              //                 onChanged: (value) {
+              //                   setState(() {
+              //                     _selectedMakul = value;
+              //                   });
+              //                 },
+              //                 value: _selectedMakul,
+              //                 isExpanded: false,
+              //                 hint: new Text(
+              //                   "Pilih",
+              //                   style: TextStyle(fontSize: 18.0),
+              //                 ),
+              //               ),
+              //             ],
+              //           );
+              //         }
+              //         return Container();
+              //       }),
+              // ),
+              StreamBuilder<QuerySnapshot>(
                   stream: _presensi,
                   builder: (context, snapshot) {
                     List<DataRow> noItem = [];
@@ -105,7 +98,8 @@ class _ListClassAdakState extends State<ListClassAdak> {
                             cells: <DataCell>[
                               DataCell(Text("${no}")),
                               DataCell(Text("${snap.id}")),
-                              DataCell(Text("${snap.data()['presensi'].toDate()}"))
+                              DataCell(Text("${snap.data()['presensi'].toDate()}")),
+                              DataCell(Text("${snap.data()['mata_kuliah']}"))
                             ])
                         );
                         no++;
@@ -130,8 +124,13 @@ class _ListClassAdakState extends State<ListClassAdak> {
                             label: Text(
                               'Waktu',
                               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                            )
-                          ],rows: noItem)
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Class Name',
+                                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                          ),
+                        ],rows: noItem)
                         )
                     );
                   }

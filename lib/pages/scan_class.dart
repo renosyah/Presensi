@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mypresensi/pages/token.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 
@@ -14,26 +15,16 @@ class ScanClass extends StatefulWidget {
 
 class _ScanClassState extends State<ScanClass> {
   String text = '';
-
   User user;
-  Future<void> getUserData() async {
-    User userData = FirebaseAuth.instance.currentUser;
-    setState(() {
-      user = userData;
-    });
-  }
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  saveClass() async {
+  saveClass(String makulName) async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-
     String deviceId;
-
-    FirebaseFirestore _firestore = FirebaseFirestore.instance;
     Map<String, dynamic> deviceData;
 
     if (Platform.isAndroid) {
       final deviceInfo = await deviceInfoPlugin.androidInfo;
-
       deviceId = deviceInfo.androidId;
       deviceData = {
         'os_version': deviceInfo.version.sdkInt.toString(),
@@ -41,8 +32,7 @@ class _ScanClassState extends State<ScanClass> {
         'model': deviceInfo.model,
         'device': deviceInfo.device,
       };
-    }
-    if (Platform.isIOS) {
+    } else if (Platform.isIOS) {
       final deviceInfo = await deviceInfoPlugin.iosInfo;
 
       deviceId = deviceInfo.identifierForVendor;
@@ -55,7 +45,6 @@ class _ScanClassState extends State<ScanClass> {
     }
 
     final nowMs = DateTime.now();
-
     final presensiRef = _firestore.collection('presensi').doc();
 
     if ((await presensiRef.get()).exists) {
@@ -64,20 +53,36 @@ class _ScanClassState extends State<ScanClass> {
       });
     } else {
       await presensiRef.set({
-        'mata_kuliah': text,
+        'mata_kuliah': makulName,
         'email': '${user.email}',
         'presensi': nowMs,
         'id': deviceId,
         'device info': deviceData,
       });
     }
+
     await Token.updateToken();
+
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      SystemNavigator.pop();
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    getUserData();
+    user = FirebaseAuth.instance.currentUser;
+    openScan();
+  }
+
+  void openScan() async {
+    String qrCode = await scanner.scan();
+    _firestore.collection('kelas').where("qrcode",isEqualTo: qrCode).limit(1).snapshots().listen((data) {
+        if (data.docs.isNotEmpty) saveClass(data.docs[0]['nama']);
+      }
+    );
   }
 
   @override
@@ -92,17 +97,7 @@ class _ScanClassState extends State<ScanClass> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(text),
-            SizedBox(height: 20.0),
-            RaisedButton(
-              onPressed: () async {
-                text = await scanner.scan();
-                saveClass();
-              },
-              child: Text('Scan'),
-            )
-          ],
+          children: [],
         ),
       ),
     );
