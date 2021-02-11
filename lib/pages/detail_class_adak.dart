@@ -1,12 +1,8 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:mypresensi/savefile/save_csv.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:uuid/uuid.dart' as uuid;
-import 'package:uuid/uuid_util.dart';
 
 class DetailClassAdak extends StatefulWidget {
 
@@ -23,7 +19,7 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
   _DetailClassAdakState({@required this.id,@required this.name});
 
   Stream<QuerySnapshot> _presensi;
-  SaveCsv saveCsv;
+  SaveExcel saveExcel;
 
   @override
   void initState() {
@@ -45,9 +41,8 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
           }
 
           setState(() {
-            saveCsv = new SaveCsv(fileName : 'rekap_presensi_${name}', header: header, body : body);
+            saveExcel = new SaveExcel(fileName : 'rekap_presensi_${name}', header: header, body : body);
           });
-
         }
       }
     );
@@ -65,34 +60,8 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (saveCsv != null) {
-
-            saveCsv.writeCSV();
-
-            showDialog<void>(
-              context: context,
-              barrierDismissible: false, // user must tap button!
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('File Saved'),
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        Text('File document for ${name} hass been save in download folder'),
-                      ],
-                    ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Ok'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    )
-                  ],
-                );
-              },
-            );
+          if (saveExcel != null) {
+            saveExcel.writeExcel();
           }
         },
         child: Icon(Icons.download_rounded),
