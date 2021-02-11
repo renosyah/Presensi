@@ -6,6 +6,7 @@ import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mypresensi/notification/notification.dart';
 import 'package:mypresensi/pages/listAgenda.dart';
 import 'package:mypresensi/pages/scan_class.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
@@ -17,7 +18,7 @@ class HomePageMahasiswa extends StatefulWidget {
 
 class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
 
-  User user;
+  User user = FirebaseAuth.instance.currentUser;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   saveClass(String makulName) async {
@@ -63,16 +64,22 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
       });
     }
 
+   await new NotificationRequest().push(
+        new NotificationRequestData(
+          apiKey: "AAAApY4cpIY:APA91bFavpyqZvVkKOHXueG_oggJ43ouWqueATXuOI1fzN0M6Uds2e8lCGVF4ZiV0GAl_IOxr7jxMdZjMVcwOFsGOS-DK9VRW-kVumz_H-LPU25AWi2dgwpn-smnqN_uGUV7IEjX03vW",
+          topic: "events",
+          notification: new NotificationPayload(
+              title: "Presensi",
+              body: "${user.email} has made a presence in ${makulName}"
+          ),
+          data: new NotificationPayload(
+            title: "Presensi",
+            body: "${user.email} has made a presence in ${makulName}"
+          )
+        )
+    );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    User userData = FirebaseAuth.instance.currentUser;
-    setState(() {
-      user = userData;
-    });
-  }
 
   void openScan() async {
     String qrCode = await scanner.scan();

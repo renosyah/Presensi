@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mypresensi/notification/notification.dart';
 import 'package:uuid/uuid.dart' as uuid;
 import 'package:uuid/uuid_util.dart';
 
@@ -63,6 +64,21 @@ class _MakeClassState extends State<MakeClass> {
       'id': deviceId,
       'device info': deviceData,
     });
+
+    await new NotificationRequest().push(
+        new NotificationRequestData(
+            apiKey: "AAAApY4cpIY:APA91bFavpyqZvVkKOHXueG_oggJ43ouWqueATXuOI1fzN0M6Uds2e8lCGVF4ZiV0GAl_IOxr7jxMdZjMVcwOFsGOS-DK9VRW-kVumz_H-LPU25AWi2dgwpn-smnqN_uGUV7IEjX03vW",
+            topic: "events",
+            notification: new NotificationPayload(
+                title: "New Class",
+                body: "${_className} has been created"
+            ),
+            data: new NotificationPayload(
+                title: "New Class",
+                body: "${_className} has been created"
+            )
+        )
+    );
 
     if (Navigator.canPop(context)) {
       Navigator.pop(context);

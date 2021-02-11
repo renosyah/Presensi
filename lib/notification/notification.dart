@@ -1,4 +1,6 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as flip;
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -72,5 +74,98 @@ class Notification {
     });
 
     _firebaseMessaging.subscribeToTopic('events');
+  }
+}
+
+class NotificationRequest {
+  Future<EmptyResponse> push(NotificationRequestData data) async {
+    final response = await http.post("https://go-firebase-notif-sender.herokuapp.com/api/v1/payload", body: jsonEncode(data.toJson()));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return EmptyResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load orders');
+    }
+  }
+}
+
+class NotificationRequestData {
+  String apiKey;
+  String topic;
+  NotificationPayload notification;
+  NotificationPayload data;
+
+  NotificationRequestData({this.apiKey, this.topic, this.notification, this.data});
+
+  NotificationRequestData.fromJson(Map<String, dynamic> json) {
+    apiKey = json['api_key'];
+    topic = json['topic'];
+    notification = json['notification'] != null
+        ? new NotificationPayload.fromJson(json['notification'])
+        : null;
+    data =
+    json['data'] != null ? new NotificationPayload.fromJson(json['data']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['api_key'] = this.apiKey;
+    data['topic'] = this.topic;
+    if (this.notification != null) {
+      data['notification'] = this.notification.toJson();
+    }
+    if (this.data != null) {
+      data['data'] = this.data.toJson();
+    }
+    return data;
+  }
+}
+
+class EmptyResponse {
+  EmptyResponse({
+    this.status,
+    this.message,
+  });
+
+  int status;
+  String message;
+
+  factory EmptyResponse.fromJson(Map<String, dynamic> json) => EmptyResponse(
+    status: json["status"],
+    message: json["message"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "message": message,
+  };
+}
+
+class Data {
+  Data();
+
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  );
+
+  Map<String, dynamic> toJson() => {
+  };
+}
+
+class NotificationPayload {
+  String title;
+  String body;
+
+  NotificationPayload({this.title, this.body});
+
+  NotificationPayload.fromJson(Map<String, dynamic> json) {
+    title = json['title'];
+    body = json['body'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['title'] = this.title;
+    data['body'] = this.body;
+    return data;
   }
 }
