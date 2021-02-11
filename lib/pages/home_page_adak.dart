@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'make_agenda.dart';
+import 'make_class.dart';
+
 class HomePageAdak extends StatefulWidget {
   @override
   _HomePageAdakState createState() => _HomePageAdakState();
@@ -56,10 +59,8 @@ class _HomePageAdakState extends State<HomePageAdak> {
                     title: "Make Class",
                     gambar: "images/class.png",
                     press: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HomePageAdak()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => MakeClass()));
                     },
                   ),
                   CategoryCard(
@@ -68,8 +69,7 @@ class _HomePageAdakState extends State<HomePageAdak> {
                       press: () {
                         Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => HomePageAdak()));
+                            MaterialPageRoute(builder: (context) => MakeAgenda()));
                       }),
                 ],
               ),

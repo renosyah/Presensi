@@ -69,8 +69,7 @@ class _HomePageDosenState extends State<HomePageDosen> {
                       press: () {
                         Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => MakeAgenda()));
+                            MaterialPageRoute(builder: (context) => MakeAgenda()));
                       }),
                 ],
               ),

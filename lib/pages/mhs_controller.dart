@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mypresensi/pages/account.dart';
 import 'package:mypresensi/pages/home_page_mhs.dart';
 import 'package:mypresensi/pages/list_class_adak.dart';
+import 'package:mypresensi/pages/list_presensi.dart';
 
 class MahasiswaController extends StatefulWidget {
   @override
@@ -13,7 +14,7 @@ class _MahasiswaControllerState extends State<MahasiswaController> {
 
   List<Widget> _screen = [
     HomePageMahasiswa(),
-    ListClassAdak(),
+    ListPresensi(),
     Account(),
   ];
 

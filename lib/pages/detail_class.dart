@@ -13,13 +13,13 @@ class DetailClass extends StatefulWidget {
   DetailClass({Key key, @required this.qrCode}) : super(key: key);
 
   @override
-  _MakeClassState createState() => _MakeClassState(qrCode: qrCode);
+  _DetailClassState createState() => _DetailClassState(qrCode: qrCode);
 }
 
-class _MakeClassState extends State<DetailClass> {
+class _DetailClassState extends State<DetailClass> {
 
   String qrCode;
-  _MakeClassState({@required this.qrCode});
+  _DetailClassState({@required this.qrCode});
 
   @override
   Widget build(BuildContext context) {

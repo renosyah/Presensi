@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mypresensi/pages/account.dart';
 import 'package:mypresensi/pages/home_page_adak.dart';
-import 'package:mypresensi/pages/listClass.dart';
-
+import 'package:mypresensi/pages/list_class_adak.dart';
 
 class AdakController extends StatefulWidget {
   @override
@@ -13,7 +12,7 @@ class _AdakControllerState extends State<AdakController> {
   PageController _pageController = PageController();
   List<Widget> _screen = [
     HomePageAdak(),
-    ListClass(),
+    ListClassAdak(),
     Account(),
   ];
 
@@ -43,19 +42,19 @@ class _AdakControllerState extends State<AdakController> {
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.home_outlined,
-                color: _selectedIndex == 0 ? Colors.blue[600] : Colors.grey,
+                color: _selectedIndex == 0 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
               ),
               label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.list_alt_outlined,
-                color: _selectedIndex == 1 ? Colors.blue[600] : Colors.grey,
+                color: _selectedIndex == 1 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
               ),
               label: 'List Class'),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,
-                color: _selectedIndex == 2 ? Colors.blue[600] : Colors.grey,
+                color: _selectedIndex == 2 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
               ),
               label: 'Account'),
         ],

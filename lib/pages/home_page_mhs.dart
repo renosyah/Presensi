@@ -21,7 +21,7 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
   User user = FirebaseAuth.instance.currentUser;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  saveClass(String makulName) async {
+  saveClass(String idClass,makulName) async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceId;
     Map<String, dynamic> deviceData;
@@ -56,6 +56,7 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
       });
     } else {
       await presensiRef.set({
+        'id_class' : idClass,
         'mata_kuliah': makulName,
         'email': '${user.email}',
         'presensi': nowMs,
@@ -84,7 +85,7 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
   void openScan() async {
     String qrCode = await scanner.scan();
     _firestore.collection('kelas').where("qrcode",isEqualTo: qrCode).limit(1).snapshots().listen((data) {
-        if (data.docs.isNotEmpty) saveClass(data.docs[0]['nama']);
+        if (data.docs.isNotEmpty) saveClass(data.docs[0].id,data.docs[0]['nama']);
       }
     );
   }

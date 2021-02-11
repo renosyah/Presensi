@@ -2,23 +2,22 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mypresensi/pages/detail_class_adak.dart';
 
-class ListClassAdak extends StatefulWidget {
+class ListPresensi extends StatefulWidget {
   @override
-  _ListClassAdakState createState() => _ListClassAdakState();
+  _ListPresensiState createState() => _ListPresensiState();
 }
 
-class _ListClassAdakState extends State<ListClassAdak> {
+class _ListPresensiState extends State<ListPresensi> {
 
-  Stream<QuerySnapshot>  _kelas;
+  Stream<QuerySnapshot> _presensi;
 
   @override
   void initState() {
     super.initState();
 
-    _kelas = FirebaseFirestore.instance
-        .collection("kelas")
+    _presensi  = FirebaseFirestore.instance
+        .collection("presensi")
         .snapshots();
   }
 
@@ -31,23 +30,23 @@ class _ListClassAdakState extends State<ListClassAdak> {
           Column(
             children: [
               StreamBuilder<QuerySnapshot>(
-                  stream: _kelas,
+                  stream: _presensi,
                   builder: (context, snapshot) {
                     List<DataRow> noItem = [];
                     if (snapshot.hasData){
+                      log("${snapshot.data.docs.toString()}");
                       int no = 1;
                       for (DocumentSnapshot snap in snapshot.data.docs) {
                         noItem.add(DataRow(
                             onSelectChanged: (bool selected) {
                               if (selected) {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => DetailClassAdak(id : snap.id,name: snap.data()['nama'],)));
+
                               }
                             },
                             cells: <DataCell>[
                               DataCell(Text("${no}")),
                               DataCell(Text("${snap.id}")),
-                              DataCell(Text("${snap.data()['nama']}")),
+                              DataCell(Text("${snap.data()['mata_kuliah']}")),
                             ])
                         );
                         no++;
@@ -70,9 +69,9 @@ class _ListClassAdakState extends State<ListClassAdak> {
                               ),
                               DataColumn(
                                   label: Text(
-                                      'Name',
+                                      'Class Name',
                                       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                              )
+                              ),
                             ],rows: noItem)
                         )
                     );

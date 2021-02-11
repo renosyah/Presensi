@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:mypresensi/pages/adak_controller.dart';
 import 'package:mypresensi/pages/dosen_controller.dart';
-import 'package:mypresensi/pages/home_page_adak.dart';
 import 'package:mypresensi/pages/mhs_controller.dart';
 import 'package:mypresensi/pages/splashscreen.page.dart';
 import 'package:mypresensi/pages/welcome_page.dart';
@@ -51,7 +51,7 @@ class MainPage extends StatelessWidget {
                     SchedulerBinding.instance.addPostFrameCallback((_) {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePageAdak()),
+                        MaterialPageRoute(builder: (context) => AdakController()),
                       );
                     });
                   } else if (user['rule'] == 'dosen') {
