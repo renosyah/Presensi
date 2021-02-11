@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mypresensi/pages/detail_class.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class ListClass extends StatefulWidget{
@@ -39,18 +40,14 @@ class _ListClassState extends State<ListClass> {
                       int no = 1;
                       for (DocumentSnapshot snap in snapshot.data.docs) {
                         noItem.add(DataRow(
+                            onSelectChanged: (bool selected) {
+                              if (selected) {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => DetailClass(qrCode:"${snap.data()['qrcode']}")));
+                              }
+                            },
                             cells: <DataCell>[
                               DataCell(Text("${no}")),
-                              DataCell(Container(
-                                height: 200,
-                                width: 200,
-                                child: QrImage(
-                                  data:"${snap.data()['qrcode']}",
-                                  version: QrVersions.auto,
-                                  size: 200.0,
-                                  gapless: false,
-                                ),
-                              )),
                               DataCell(Text("${snap.id}")),
                               DataCell(Text("${snap.data()['nama']}")),
                             ])
@@ -62,15 +59,10 @@ class _ListClassState extends State<ListClass> {
                         scrollDirection: Axis.vertical,
                         child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: DataTable(dataRowHeight: 200, columns: <DataColumn>[
+                            child: DataTable(showCheckboxColumn : false,columns: <DataColumn>[
                               DataColumn(
                                   label: Text(
                                       'No',
-                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                              ),
-                              DataColumn(
-                                  label: Text(
-                                      'QrCode',
                                       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                               ),
                               DataColumn(

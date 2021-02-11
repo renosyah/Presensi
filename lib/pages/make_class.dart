@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart' as uuid;
 import 'package:uuid/uuid_util.dart';
 
@@ -63,6 +64,11 @@ class _MakeClassState extends State<MakeClass> {
       'device info': deviceData,
     });
 
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      SystemNavigator.pop();
+    }
   }
 
   @override

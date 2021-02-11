@@ -1,9 +1,14 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mypresensi/pages/listAgenda.dart';
 import 'package:mypresensi/pages/scan_class.dart';
-
+import 'package:qrscan/qrscan.dart' as scanner;
 
 class HomePageMahasiswa extends StatefulWidget {
   @override
@@ -11,18 +16,70 @@ class HomePageMahasiswa extends StatefulWidget {
 }
 
 class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
+
   User user;
-  Future<void> getUserData() async {
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  saveClass(String makulName) async {
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    String deviceId;
+    Map<String, dynamic> deviceData;
+
+    if (Platform.isAndroid) {
+      final deviceInfo = await deviceInfoPlugin.androidInfo;
+      deviceId = deviceInfo.androidId;
+      deviceData = {
+        'os_version': deviceInfo.version.sdkInt.toString(),
+        'platform': 'android',
+        'model': deviceInfo.model,
+        'device': deviceInfo.device,
+      };
+    } else if (Platform.isIOS) {
+      final deviceInfo = await deviceInfoPlugin.iosInfo;
+
+      deviceId = deviceInfo.identifierForVendor;
+      deviceData = {
+        'os_version': deviceInfo.systemVersion,
+        'platform': 'ios',
+        'model': deviceInfo.model,
+        'device': deviceInfo.name,
+      };
+    }
+
+    final nowMs = DateTime.now();
+    final presensiRef = _firestore.collection('presensi').doc();
+
+    if ((await presensiRef.get()).exists) {
+      await presensiRef.update({
+        'waktu presensi': nowMs,
+      });
+    } else {
+      await presensiRef.set({
+        'mata_kuliah': makulName,
+        'email': '${user.email}',
+        'presensi': nowMs,
+        'id': deviceId,
+        'device info': deviceData,
+      });
+    }
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
     User userData = FirebaseAuth.instance.currentUser;
     setState(() {
       user = userData;
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getUserData();
+  void openScan() async {
+    String qrCode = await scanner.scan();
+    _firestore.collection('kelas').where("qrcode",isEqualTo: qrCode).limit(1).snapshots().listen((data) {
+        if (data.docs.isNotEmpty) saveClass(data.docs[0]['nama']);
+      }
+    );
   }
 
   @override
@@ -60,8 +117,9 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
                     title: "Scan Class",
                     gambar: "images/qr.jpg",
                     press: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ScanClass()));
+                      openScan();
+                      // Navigator.push(context,
+                      //     MaterialPageRoute(builder: (context) => ScanClass()));
                     },
                   ),
                   CategoryCard(
