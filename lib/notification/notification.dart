@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as flip;
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+
+// variabel untuk notifikasi chanel
 const flip.AndroidNotificationChannel channel = flip.AndroidNotificationChannel(
   'high_importance_channel', // id
   'High Importance Notifications', // title
@@ -11,9 +13,13 @@ const flip.AndroidNotificationChannel channel = flip.AndroidNotificationChannel(
   importance: flip.Importance.max,
 );
 
+// instance firebase messaging
 final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+// instance untuk notifikasi
 final flip.FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = flip.FlutterLocalNotificationsPlugin();
 
+// bentuk notifikasi
 final flip.AndroidNotificationDetails androidPlatformChannelSpecifics =  flip.AndroidNotificationDetails(
     channel.id, channel.name, channel.description,
     icon: '@mipmap/ic_launcher',
@@ -22,6 +28,7 @@ final flip.AndroidNotificationDetails androidPlatformChannelSpecifics =  flip.An
     ticker: 'ticker'
 );
 
+// fungsi untuk menangani notifikasi yang datang dari background
 Future<dynamic> _backgroundMessageHandler(Map<String, dynamic> message) async {
   print("onBackgroundMessage: $message");
   if (message.containsKey('data')) {
@@ -40,22 +47,19 @@ Future<dynamic> _backgroundMessageHandler(Map<String, dynamic> message) async {
   }
 }
 
+
+// kelas notifikasi
 class Notification {
 
+  // fungsi inisialisasi notikasi
+  // dan registrasi notifkasi saat aplikasi running
   void init() async {
 
     _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
-        _backgroundMessageHandler(message);
-      },
+      onMessage: _backgroundMessageHandler,
       onBackgroundMessage: _backgroundMessageHandler,
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-      },
+      onLaunch: (Map<String, dynamic> message) async { },
+      onResume: (Map<String, dynamic> message) async { },
     );
 
     _firebaseMessaging.requestNotificationPermissions(
@@ -77,7 +81,11 @@ class Notification {
   }
 }
 
+
+// kelas request notifikasi
 class NotificationRequest {
+
+  // fungsi push notifikasi ke server custom
   Future<EmptyResponse> push(NotificationRequestData data) async {
     final response = await http.post("https://go-firebase-notif-sender.herokuapp.com/api/v1/payload", body: jsonEncode(data.toJson()));
 
@@ -89,6 +97,7 @@ class NotificationRequest {
   }
 }
 
+// kelas untuk payload notifikasi yang akan dikirim
 class NotificationRequestData {
   String apiKey;
   String topic;
@@ -121,6 +130,7 @@ class NotificationRequestData {
   }
 }
 
+// kelas untuk response kosong
 class EmptyResponse {
   EmptyResponse({
     this.status,
@@ -141,6 +151,7 @@ class EmptyResponse {
   };
 }
 
+// data response kosong
 class Data {
   Data();
 
@@ -151,6 +162,7 @@ class Data {
   };
 }
 
+// kelas untuk payload notifikasi yang akan diterima
 class NotificationPayload {
   String title;
   String body;

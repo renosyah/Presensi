@@ -21,7 +21,9 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
   User user = FirebaseAuth.instance.currentUser;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  saveClass(String idClass,makulName) async {
+  // fungsi menyimpan presensi
+  // dengan id class dan nama kelas/makul
+  saveClass(String idClass, makulName) async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceId;
     Map<String, dynamic> deviceData;
@@ -65,6 +67,7 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
       });
     }
 
+    // memanggil fungsi untuk push notifikasi
    await new NotificationRequest().push(
         new NotificationRequestData(
           apiKey: "AAAApY4cpIY:APA91bFavpyqZvVkKOHXueG_oggJ43ouWqueATXuOI1fzN0M6Uds2e8lCGVF4ZiV0GAl_IOxr7jxMdZjMVcwOFsGOS-DK9VRW-kVumz_H-LPU25AWi2dgwpn-smnqN_uGUV7IEjX03vW",
@@ -82,9 +85,14 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
   }
 
 
+  // deklarasi funsi untuk scan qrcode
   void openScan() async {
     String qrCode = await scanner.scan();
+
+    // cari kelas berdasarkan qrcode
     _firestore.collection('kelas').where("qrcode",isEqualTo: qrCode).limit(1).snapshots().listen((data) {
+
+        // tambahkan data presensi
         if (data.docs.isNotEmpty) saveClass(data.docs[0].id,data.docs[0]['nama']);
       }
     );

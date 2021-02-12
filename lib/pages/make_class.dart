@@ -24,6 +24,8 @@ class _MakeClassState extends State<MakeClass> {
   @override
   void initState() {
     super.initState();
+
+    // membuat uuid untuk qrcode kelas
     _qrCode = uuid.Uuid().v4(options: {'rng': UuidUtil.cryptoRNG});
   }
 
@@ -65,6 +67,7 @@ class _MakeClassState extends State<MakeClass> {
       'device info': deviceData,
     });
 
+    // memanagil fungsi push notifkasi
     await new NotificationRequest().push(
         new NotificationRequestData(
             apiKey: "AAAApY4cpIY:APA91bFavpyqZvVkKOHXueG_oggJ43ouWqueATXuOI1fzN0M6Uds2e8lCGVF4ZiV0GAl_IOxr7jxMdZjMVcwOFsGOS-DK9VRW-kVumz_H-LPU25AWi2dgwpn-smnqN_uGUV7IEjX03vW",
@@ -80,6 +83,8 @@ class _MakeClassState extends State<MakeClass> {
         )
     );
 
+    // hancurkan halaman
+    // kembali ke menu sebelumnya
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     } else {

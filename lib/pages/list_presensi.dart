@@ -39,9 +39,7 @@ class _ListPresensiState extends State<ListPresensi> {
                       for (DocumentSnapshot snap in snapshot.data.docs) {
                         noItem.add(DataRow(
                             onSelectChanged: (bool selected) {
-                              if (selected) {
-
-                              }
+                              if (selected) { }
                             },
                             cells: <DataCell>[
                               DataCell(Text("${no}")),

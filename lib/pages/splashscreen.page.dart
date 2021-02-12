@@ -43,14 +43,15 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  Text('This app need to access camera'),
+                  Text('This app need to access camera or qrcode scan cannot be use,'),
+                  Text('Access app setting and enable all permission required.'),
                   Text('Would you like to approve of this?'),
                 ],
               ),
             ),
             actions: <Widget>[
               TextButton(
-                child: Text('Deny'),
+                child: Text('Ignore'),
                 onPressed: () {
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => MainPage()));
