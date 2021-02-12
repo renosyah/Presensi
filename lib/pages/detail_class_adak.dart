@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mypresensi/savefile/save_csv.dart';
 
+// ini adalah kelas yang digunakan untuk menampilkan list
+// presensi yang akan dicetak oleh adak
 class DetailClassAdak extends StatefulWidget {
 
   String id,name;

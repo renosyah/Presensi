@@ -8,6 +8,8 @@ import 'package:mypresensi/notification/notification.dart';
 import 'package:uuid/uuid.dart' as uuid;
 import 'package:uuid/uuid_util.dart';
 
+// ini adalah kelas yang digunakan untuk membuta kelas baru
+// yg akan ditampilkan di list kelas dan akan discan oleh mahasiswa
 class MakeClass extends StatefulWidget {
   MakeClass({Key key}) : super(key: key);
 
@@ -29,6 +31,7 @@ class _MakeClassState extends State<MakeClass> {
     _qrCode = uuid.Uuid().v4(options: {'rng': UuidUtil.cryptoRNG});
   }
 
+  // fungsi untuk membuat kelas
   createClass() async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceId;

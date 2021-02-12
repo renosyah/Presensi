@@ -133,7 +133,10 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
                     title: "Scan Class",
                     gambar: "images/qr.jpg",
                     press: () {
+
+                      // memanggil fungsi open scan
                       openScan();
+
                       // Navigator.push(context,
                       //     MaterialPageRoute(builder: (context) => ScanClass()));
                     },

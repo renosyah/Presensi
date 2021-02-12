@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mypresensi/pages/detail_class.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
+// ini adalah kelas yang digunakan untuk menampilkan list kelas
+// yang dimana saat salah satu itek diklik
+// maka akan dinavigasikan ke detail kelas
 class ListClass extends StatefulWidget{
   @override
   _ListClassState createState() => _ListClassState();

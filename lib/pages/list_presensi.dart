@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+// ini adalah kelas yang digunakan untuk menampilkan list presensi
+// yang telah dihadiri oleh mahasiswa
 class ListPresensi extends StatefulWidget {
   @override
   _ListPresensiState createState() => _ListPresensiState();

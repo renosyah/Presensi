@@ -7,6 +7,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uuid/uuid.dart' as uuid;
 import 'package:uuid/uuid_util.dart';
 
+
+// ini adalah kelas yang digunakan untuk menampilkan qrcode
+// yg akan discan oleh mahasiswa
 class DetailClass extends StatefulWidget {
 
   String qrCode;
