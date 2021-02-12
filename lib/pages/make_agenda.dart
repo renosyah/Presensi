@@ -7,7 +7,9 @@ import 'package:device_info/device_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:mypresensi/notification/notification.dart';
 
 class MakeAgenda extends StatefulWidget {
   @override
@@ -120,7 +122,30 @@ class _MakeAgendaState extends State<MakeAgenda> {
         'device info': deviceData,
       });
     }
-    sendAndRetrieveMessage(_buildToken());
+
+
+    await new NotificationRequest().push(
+        new NotificationRequestData(
+            apiKey: "AAAApY4cpIY:APA91bFavpyqZvVkKOHXueG_oggJ43ouWqueATXuOI1fzN0M6Uds2e8lCGVF4ZiV0GAl_IOxr7jxMdZjMVcwOFsGOS-DK9VRW-kVumz_H-LPU25AWi2dgwpn-smnqN_uGUV7IEjX03vW",
+            topic: "events",
+            notification: new NotificationPayload(
+                title: "New Agenda",
+                body: "new agenda has been created"
+            ),
+            data: new NotificationPayload(
+                title: "New Agenda",
+                body: "new agenda has been created"
+            )
+        )
+    );
+
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      SystemNavigator.pop();
+    }
+
+    //sendAndRetrieveMessage(_buildToken());
   }
 
   @override
