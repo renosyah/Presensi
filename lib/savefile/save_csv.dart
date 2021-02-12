@@ -39,6 +39,8 @@ class SaveExcel {
     // jika ada, hapus dulu
     if (file.existsSync()){ file.deleteSync(recursive: true); }
 
+    // memanggil fungsi untuk mengisi file
+    // dengan data excel
     write().then((onValue) {
       file
         ..createSync(recursive: true)

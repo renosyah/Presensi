@@ -35,10 +35,12 @@ Future<dynamic> _backgroundMessageHandler(Map<String, dynamic> message) async {
     var title = message['data']['title'];
     var body = message['data']['body'];
 
+    // registrasi plugin notifikasi
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<flip.AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
+    // tunjukan notifikasi
     await flutterLocalNotificationsPlugin.show(
         0, title, body,flip.NotificationDetails(
         android: androidPlatformChannelSpecifics
@@ -55,6 +57,8 @@ class Notification {
   // dan registrasi notifkasi saat aplikasi running
   void init() async {
 
+    // registrasi
+    // kapan notifikasi diterima
     _firebaseMessaging.configure(
       onMessage: _backgroundMessageHandler,
       onBackgroundMessage: _backgroundMessageHandler,
@@ -62,21 +66,25 @@ class Notification {
       onResume: (Map<String, dynamic> message) async { },
     );
 
+    // setting permission untuk ios
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(
             sound: true, badge: true, alert: true, provisional: true)
     );
 
+    // setting permission untuk ios
     _firebaseMessaging.onIosSettingsRegistered
         .listen((IosNotificationSettings settings) {
       print("Settings registered: $settings");
     });
 
+    // request token, hanya untuk mengecheck saja
     _firebaseMessaging.getToken().then((String token) {
       assert(token != null);
       print("Push Messaging token: $token");
     });
 
+    // subscribe ke event notifikasi
     _firebaseMessaging.subscribeToTopic('events');
   }
 }
