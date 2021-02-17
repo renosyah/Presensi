@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:mypresensi/notification/notification.dart';
 import 'package:mypresensi/pages/listAgenda.dart';
 import 'package:mypresensi/pages/scan_class.dart';
+import 'package:mypresensi/session/session.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 
 class HomePageMahasiswa extends StatefulWidget {
@@ -18,12 +19,12 @@ class HomePageMahasiswa extends StatefulWidget {
 
 class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
 
-  User user = FirebaseAuth.instance.currentUser;
+  //User user = FirebaseAuth.instance.currentUser;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // fungsi menyimpan presensi
   // dengan id class dan nama kelas/makul
-  saveClass(String idClass, makulName) async {
+  saveClass(UserSession user,String idClass, makulName) async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     String deviceId;
     Map<String, dynamic> deviceData;
@@ -93,7 +94,10 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
     _firestore.collection('kelas').where("qrcode",isEqualTo: qrCode).limit(1).snapshots().listen((data) {
 
         // tambahkan data presensi
-        if (data.docs.isNotEmpty) saveClass(data.docs[0].id,data.docs[0]['nama']);
+        SessionManager().load().then((value){
+          if (data.docs.isNotEmpty) saveClass(value,data.docs[0].id,data.docs[0]['nama']);
+        });
+
       }
     );
   }
@@ -112,12 +116,26 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
           ),
           Container(
             padding: EdgeInsets.symmetric(vertical: 70.0, horizontal: 20.0),
-            child: Text(
-              "${user.email} \nHave A Good Day",
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5
-                  .copyWith(fontWeight: FontWeight.w900, color: Colors.white),
+            child: FutureBuilder<UserSession>(
+              future: SessionManager().load(),
+              builder: (context,snapshot){
+                if (snapshot.hasData){
+                  return Text(
+                    "${snapshot.data.email} \nHave A Good Day",
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline5
+                        .copyWith(fontWeight: FontWeight.w900, color: Colors.white),
+                  );
+                }
+                return Text(
+                  "Have A Good Day",
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline5
+                      .copyWith(fontWeight: FontWeight.w900, color: Colors.white),
+                );
+              },
             ),
           ),
           Container(

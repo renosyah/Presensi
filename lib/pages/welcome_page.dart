@@ -63,36 +63,36 @@ class _WelcomePageState extends State<WelcomePage> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border(
-                        bottom: BorderSide(color: Colors.black),
-                        top: BorderSide(color: Colors.black),
-                        left: BorderSide(color: Colors.black),
-                        right: BorderSide(color: Colors.black),
-                      ),
-                    ),
-                    child: MaterialButton(
-                      minWidth: double.infinity,
-                      height: 60,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RegisterPage()));
-                      },
-                      color: Colors.lightBlue,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50)),
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 18),
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(50),
+                  //     border: Border(
+                  //       bottom: BorderSide(color: Colors.black),
+                  //       top: BorderSide(color: Colors.black),
+                  //       left: BorderSide(color: Colors.black),
+                  //       right: BorderSide(color: Colors.black),
+                  //     ),
+                  //   ),
+                  //   child: MaterialButton(
+                  //     minWidth: double.infinity,
+                  //     height: 60,
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //           context,
+                  //           MaterialPageRoute(
+                  //               builder: (context) => RegisterPage()));
+                  //     },
+                  //     color: Colors.lightBlue,
+                  //     elevation: 0,
+                  //     shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(50)),
+                  //     child: Text(
+                  //       "Sign Up",
+                  //       style: TextStyle(
+                  //           fontWeight: FontWeight.w600, fontSize: 18),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ],

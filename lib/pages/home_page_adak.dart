@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mypresensi/pages/account.dart';
+import 'package:mypresensi/pages/list_class_adak.dart';
+import 'package:mypresensi/session/session.dart';
 
 import 'make_agenda.dart';
 import 'make_class.dart';
@@ -10,20 +13,6 @@ class HomePageAdak extends StatefulWidget {
 }
 
 class _HomePageAdakState extends State<HomePageAdak> {
-  User user;
-  Future<void> getUserData() async {
-    User userData = FirebaseAuth.instance.currentUser;
-    setState(() {
-      user = userData;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getUserData();
-  }
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -38,12 +27,26 @@ class _HomePageAdakState extends State<HomePageAdak> {
           ),
           Container(
             padding: EdgeInsets.only(left: 20, top: 80),
-            child: Text(
-              "${user.email} \nHave A Good Day",
-              style: Theme.of(context)
-                  .textTheme
-                  .headline5
-                  .copyWith(fontWeight: FontWeight.w900, color: Colors.white),
+            child: FutureBuilder<UserSession>(
+              future: SessionManager().load(),
+              builder: (context,snapshot){
+                if (snapshot.hasData){
+                  return Text(
+                    "${snapshot.data.email} \nHave A Good Day",
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline5
+                        .copyWith(fontWeight: FontWeight.w900, color: Colors.white),
+                  );
+                }
+                return Text(
+                  "Have A Good Day",
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline5
+                      .copyWith(fontWeight: FontWeight.w900, color: Colors.white),
+                );
+              },
             ),
           ),
           Container(
@@ -54,24 +57,7 @@ class _HomePageAdakState extends State<HomePageAdak> {
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 20,
                 childAspectRatio: 0.85,
-                children: <Widget>[
-                  CategoryCard(
-                    title: "Make Class",
-                    gambar: "images/class.png",
-                    press: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => MakeClass()));
-                    },
-                  ),
-                  CategoryCard(
-                      title: "Make Agenda",
-                      gambar: "images/cal2.png",
-                      press: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MakeAgenda()));
-                      }),
-                ],
+                children: <Widget>[],
               ),
             ),
           )

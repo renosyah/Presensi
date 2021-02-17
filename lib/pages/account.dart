@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mypresensi/pages/welcome_page.dart';
+import 'package:mypresensi/session/session.dart';
 
 class Account extends StatefulWidget {
   @override
@@ -70,6 +71,9 @@ class _AccountState extends State<Account> {
               onPressed: () async {
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
                   await FirebaseAuth.instance.signOut();
+
+                  await SessionManager().clear();
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => WelcomePage()),

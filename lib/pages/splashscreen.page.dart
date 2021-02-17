@@ -1,7 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mypresensi/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:mypresensi/pages/adak_controller.dart';
+import 'package:mypresensi/pages/dosen_controller.dart';
+import 'package:mypresensi/pages/mhs_controller.dart';
+import 'package:mypresensi/pages/welcome_page.dart';
+import 'package:mypresensi/session/session.dart';
 import '../notification/notification.dart' as notif;
 import 'dart:async';
 import 'package:permission_handler/permission_handler.dart' as permission;
@@ -97,6 +104,56 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
           child: Image.asset("images/acacom.png", width: 700.0, height: 200.0),
         ),
       ),
+    );
+  }
+}
+
+
+class MainPage extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<UserSession>(
+      future: SessionManager().load(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData){
+          var user = snapshot.data;
+
+          if (user.role == 'adak') {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdakController()),
+              );
+            });
+          // }
+          // else if (user.role == 'dosen') {
+          //   SchedulerBinding.instance.addPostFrameCallback((_) {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //           builder: (context) => DosenController()),
+          //     );
+          //   });
+          } else if (user.role == 'user'){
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MahasiswaController()),
+              );
+            });
+          }
+          return Container(
+            child: Material(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+        return WelcomePage();
+      },
     );
   }
 }

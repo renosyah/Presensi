@@ -11,7 +11,7 @@ class AdakController extends StatefulWidget {
 class _AdakControllerState extends State<AdakController> {
   PageController _pageController = PageController();
   List<Widget> _screen = [
-    HomePageAdak(),
+    // HomePageAdak(),
     ListClassAdak(),
     Account(),
   ];
@@ -39,22 +39,22 @@ class _AdakControllerState extends State<AdakController> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: _onItemTapped,
         items: [
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home_outlined,
-                color: _selectedIndex == 0 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
-              ),
-              label: 'Home'),
+          // BottomNavigationBarItem(
+          //     icon: Icon(
+          //       Icons.home_outlined,
+          //       color: _selectedIndex == 0 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
+          //     ),
+          //     label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.list_alt_outlined,
-                color: _selectedIndex == 1 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
+                color: _selectedIndex == 0 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
               ),
               label: 'List Class'),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,
-                color: _selectedIndex == 2 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
+                color: _selectedIndex == 1 ? Color.fromARGB(255, 32, 178, 170) : Colors.grey,
               ),
               label: 'Account'),
         ],

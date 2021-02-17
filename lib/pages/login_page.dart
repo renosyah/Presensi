@@ -1,7 +1,14 @@
 import 'dart:developer';
 
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:mypresensi/pages/adak_controller.dart';
+import 'package:mypresensi/pages/dosen_controller.dart';
+import 'package:mypresensi/pages/mhs_controller.dart';
+import 'package:mypresensi/pages/splashscreen.page.dart';
+import 'package:mypresensi/session/session.dart';
 
 class LoginPage extends StatefulWidget {
   static Pattern pattern =
@@ -14,7 +21,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   RegExp regExp = RegExp(LoginPage.pattern);
 
-  UserCredential userCredential;
+  //UserCredential userCredential;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -28,15 +35,16 @@ class _LoginPageState extends State<LoginPage> {
       // );
       log('log : Email is Empty.');
       return;
-    } else if (!regExp.hasMatch(emailController.text)) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text("Please enter valid email."),
-      //   ),
-      // );
-      log('log : Please enter valid email.');
-      return;
     }
+    // else if (!regExp.hasMatch(emailController.text)) {
+    //   // ScaffoldMessenger.of(context).showSnackBar(
+    //   //   SnackBar(
+    //   //     content: Text("Please enter valid email."),
+    //   //   ),
+    //   // );
+    //   log('log : Please enter valid email.');
+    //   return;
+    // }
     if (passwordController.text.trim().isEmpty) {
       // ScaffoldMessenger.of(context).showSnackBar(
       //   SnackBar(
@@ -51,27 +59,81 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future loginAuth() async {
-    try {
-      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //     content: Text("No user found for that email."),
-        //   ),
-        // );
-        log('log : No user found for that email.');
-        return;
-      } else if (e.code == 'wrong-password') {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //     content: Text("Wrong password provided for that user."),
-        //   ),
-        // );
-        log('log : Wrong password provided for that user.');
-        return;
-      }
+
+    // jika login sebagai role siswa
+    FirebaseFirestore.instance
+        .collection("userDatas")
+        .where("nim",isEqualTo: emailController.text)
+        .where("password",isEqualTo: passwordController.text)
+        .limit(1)
+        .get().then((value){
+            if (value.docs.isNotEmpty && value.docs[0].data()['password'] == passwordController.text){
+              var user = UserSession(id:value.docs[0].id, name : "",email: value.docs[0].data()['email'], role : value.docs[0].data()['rule']);
+              SessionManager().save(user).then((v){ validateRole(v); });
+            }
+        });
+
+    // jika login sebagai role adak
+    FirebaseFirestore.instance
+        .collection("userDatas")
+        .where("email",isEqualTo: emailController.text)
+        .limit(1)
+        .get().then((value){
+          if (value.docs.isNotEmpty && value.docs[0].data()['password'] == passwordController.text){
+            var user = UserSession(id:value.docs[0].id, name : "",email: value.docs[0].data()['email'], role : value.docs[0].data()['rule']);
+            SessionManager().save(user).then((v){ validateRole(v); });
+        }
+    });
+
+    // try {
+    //   userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+    //       email: emailController.text, password: passwordController.text);
+    // } on FirebaseAuthException catch (e) {
+    //   if (e.code == 'user-not-found') {
+    //     // ScaffoldMessenger.of(context).showSnackBar(
+    //     //   SnackBar(
+    //     //     content: Text("No user found for that email."),
+    //     //   ),
+    //     // );
+    //     log('log : No user found for that email.');
+    //     return;
+    //   } else if (e.code == 'wrong-password') {
+    //     // ScaffoldMessenger.of(context).showSnackBar(
+    //     //   SnackBar(
+    //     //     content: Text("Wrong password provided for that user."),
+    //     //   ),
+    //     // );
+    //     log('log : Wrong password provided for that user.');
+    //     return;
+    //   }
+    // }
+  }
+
+  void validateRole(UserSession user){
+    if (user.role == 'adak') {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AdakController()),
+        );
+      });
+    // }
+    // else if (user.role == 'dosen') {
+    //   SchedulerBinding.instance.addPostFrameCallback((_) {
+    //     Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //           builder: (context) => DosenController()),
+    //     );
+    //   });
+    } else if (user.role == 'user'){
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MahasiswaController()),
+        );
+      });
     }
   }
 
