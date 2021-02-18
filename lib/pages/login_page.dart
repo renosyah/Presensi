@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
         .where("password",isEqualTo: passwordController.text)
         .limit(1)
         .get().then((value){
-            if (value.docs.isNotEmpty && value.docs[0].data()['password'] == passwordController.text){
+            if (value.docs.isNotEmpty && value.docs[0].data()['password'] == passwordController.text && value.docs[0].data()['rule'] == 'user'){
               var user = UserSession(id:value.docs[0].id, name : "",email: value.docs[0].data()['email'], role : value.docs[0].data()['rule']);
               SessionManager().save(user).then((v){ validateRole(v); });
             }
@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
         .where("email",isEqualTo: emailController.text)
         .limit(1)
         .get().then((value){
-          if (value.docs.isNotEmpty && value.docs[0].data()['password'] == passwordController.text){
+          if (value.docs.isNotEmpty && value.docs[0].data()['password'] == passwordController.text && value.docs[0].data()['rule'] == 'adak'){
             var user = UserSession(id:value.docs[0].id, name : "",email: value.docs[0].data()['email'], role : value.docs[0].data()['rule']);
             SessionManager().save(user).then((v){ validateRole(v); });
         }
