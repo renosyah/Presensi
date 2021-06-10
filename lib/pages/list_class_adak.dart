@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mypresensi/kelas/kelas.dart';
 import 'package:mypresensi/pages/detail_class_adak.dart';
 
 class ListClassAdak extends StatefulWidget {
@@ -11,7 +12,11 @@ class ListClassAdak extends StatefulWidget {
 
 class _ListClassAdakState extends State<ListClassAdak> {
 
-  Stream<QuerySnapshot>  _kelas;
+  //---------------------------------revisi--------------------------------------//
+  // - data presensi diambil dari collection kelas (ok)
+
+
+  Stream<QuerySnapshot> _kelas;
 
   @override
   void initState() {
@@ -37,17 +42,31 @@ class _ListClassAdakState extends State<ListClassAdak> {
                     if (snapshot.hasData){
                       int no = 1;
                       for (DocumentSnapshot snap in snapshot.data.docs) {
+                        Kelas kelas = Kelas.fromJson(snap.data());
+                        int jumlah_hadir = 0;
+                        int jumlah_tidak_hadir = 0;
+
+                        for (Mahasiswa m in kelas.mahasiswa){
+                          if (m.hadir){
+                            jumlah_hadir++;
+                          } else {
+                            jumlah_tidak_hadir++;
+                          }
+                        }
+
                         noItem.add(DataRow(
                             onSelectChanged: (bool selected) {
                               if (selected) {
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => DetailClassAdak(id : snap.id,name: snap.data()['nama'],)));
+                                    MaterialPageRoute(builder: (context) => DetailClassAdak(kelas: kelas)));
                               }
                             },
                             cells: <DataCell>[
                               DataCell(Text("${no}")),
-                              DataCell(Text("${snap.id}")),
-                              DataCell(Text("${snap.data()['nama']}")),
+                              DataCell(Text("${kelas.pertemuan}")),
+                              DataCell(Text("${kelas.makul}")),
+                              DataCell(Text("${jumlah_hadir}")),
+                              DataCell(Text("${jumlah_tidak_hadir}")),
                             ])
                         );
                         no++;
@@ -65,14 +84,24 @@ class _ListClassAdakState extends State<ListClassAdak> {
                               ),
                               DataColumn(
                                   label: Text(
-                                      ' Id',
+                                      'Pertemuan',
                                       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                               ),
                               DataColumn(
                                   label: Text(
-                                      'Name',
+                                      'Matakuliah',
                                       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                              )
+                              ),
+                              DataColumn(
+                                  label: Text(
+                                      'Hadir',
+                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                              ),
+                              DataColumn(
+                                  label: Text(
+                                      'Tidak Hadir',
+                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                              ),
                             ],rows: noItem)
                         )
                     );
@@ -85,3 +114,5 @@ class _ListClassAdakState extends State<ListClassAdak> {
     );
   }
 }
+
+//-----------------------------------------------------------------------//

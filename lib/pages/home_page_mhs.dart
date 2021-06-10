@@ -6,6 +6,7 @@ import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mypresensi/kelas/kelas.dart';
 import 'package:mypresensi/notification/notification.dart';
 import 'package:mypresensi/pages/listAgenda.dart';
 import 'package:mypresensi/pages/scan_class.dart';
@@ -22,51 +23,52 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
   //User user = FirebaseAuth.instance.currentUser;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+
+  //---------------------------------revisi--------------------------------------//
+  // - data presensi diambil/validasi/update dari collection kelas (ok)
+  // - pada saat scan, check jika id mahasiswa ada di kelas/pertemuan makul (ok)
+  // - jika tidak ada, tampilkan alert dialog, 'anda tidak mengambil kelas ini' (ok)
+  // - update status mahasiswa di kelas/pertemuan makul dari hadir = false => hadir true (ok)
+
+
   // fungsi menyimpan presensi
   // dengan id class dan nama kelas/makul
-  saveClass(UserSession user,String idClass, makulName) async {
-    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-    String deviceId;
-    Map<String, dynamic> deviceData;
+  updatePresensiKelas(String userId, QueryDocumentSnapshot kelasSnapshot) async {
 
-    if (Platform.isAndroid) {
-      final deviceInfo = await deviceInfoPlugin.androidInfo;
-      deviceId = deviceInfo.androidId;
-      deviceData = {
-        'os_version': deviceInfo.version.sdkInt.toString(),
-        'platform': 'android',
-        'model': deviceInfo.model,
-        'device': deviceInfo.device,
-      };
-    } else if (Platform.isIOS) {
-      final deviceInfo = await deviceInfoPlugin.iosInfo;
+    var userDatas = await FirebaseFirestore.instance
+        .collection("userDatas")
+        .doc(userId)
+        .get();
 
-      deviceId = deviceInfo.identifierForVendor;
-      deviceData = {
-        'os_version': deviceInfo.systemVersion,
-        'platform': 'ios',
-        'model': deviceInfo.model,
-        'device': deviceInfo.name,
-      };
+    if (!userDatas.exists){
+      return;
     }
 
-    final nowMs = DateTime.now();
-    final presensiRef = _firestore.collection('presensi').doc();
+    Kelas kelas = Kelas.fromJson(kelasSnapshot.data());
 
-    if ((await presensiRef.get()).exists) {
-      await presensiRef.update({
-        'waktu presensi': nowMs,
-      });
-    } else {
-      await presensiRef.set({
-        'id_class' : idClass,
-        'mata_kuliah': makulName,
-        'email': '${user.email}',
-        'presensi': nowMs,
-        'id': deviceId,
-        'device info': deviceData,
-      });
+    int pos = 0;
+    bool exist = false;
+    for (int i=0;i<kelas.mahasiswa.length;i++){
+        if (kelas.mahasiswa[i].nim == userDatas.data()['nim']){
+          exist = true;
+          break;
+        }
+        pos++;
     }
+
+    if (!exist){
+      Scaffold.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Mahasiswa tidak terdaftar di matakuliah ini!'),
+        ),
+      );
+      return;
+    }
+
+    kelas.mahasiswa[pos].hadir = true;
+    kelas.mahasiswa[pos].waktu = DateTime.now().toString();
+
+    await _firestore.collection('kelas').doc(kelasSnapshot.id).update(kelas.toJson());
 
     // memanggil fungsi untuk push notifikasi
    await new NotificationRequest().push(
@@ -75,11 +77,11 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
           topic: "events",
           notification: new NotificationPayload(
               title: "Presensi",
-              body: "${user.email} has made a presence in ${makulName}"
+              body: "${userDatas.data()['nim']} has made a presence in ${kelasSnapshot.data()['makul']}"
           ),
           data: new NotificationPayload(
             title: "Presensi",
-            body: "${user.email} has made a presence in ${makulName}"
+            body: "${userDatas.data()['nim']} has made a presence in ${kelasSnapshot.data()['makul']}"
           )
         )
     );
@@ -91,16 +93,21 @@ class _HomePageMahasiswaState extends State<HomePageMahasiswa> {
     String qrCode = await scanner.scan();
 
     // cari kelas berdasarkan qrcode
-    _firestore.collection('kelas').where("qrcode",isEqualTo: qrCode).limit(1).snapshots().listen((data) {
-
-        // tambahkan data presensi
-        SessionManager().load().then((value){
-          if (data.docs.isNotEmpty) saveClass(value,data.docs[0].id,data.docs[0]['nama']);
+    FirebaseFirestore.instance
+        .collection("kelas")
+        .where("qr_code", isEqualTo: qrCode)
+        .limit(1)
+        .get().then((data){
+            SessionManager().load().then((value){
+              if (data.docs.isNotEmpty) updatePresensiKelas(value.id, data.docs[0]);
+            });
         });
-
-      }
-    );
   }
+
+  //-----------------------------------------------------------------------//
+
+
+
 
   @override
   Widget build(BuildContext context) {

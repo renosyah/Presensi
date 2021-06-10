@@ -1,54 +1,89 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mypresensi/kelas/kelas.dart';
 import 'package:mypresensi/savefile/save_csv.dart';
 
 // ini adalah kelas yang digunakan untuk menampilkan list
 // presensi yang akan dicetak oleh adak
 class DetailClassAdak extends StatefulWidget {
 
-  String id,name;
-  DetailClassAdak({Key key, @required this.id,@required this.name}) : super(key: key);
+  Kelas kelas;
+  DetailClassAdak({Key key, @required this.kelas}) : super(key: key);
 
   @override
-  _DetailClassAdakState createState() => _DetailClassAdakState(id : id,name: name);
+  _DetailClassAdakState createState() => _DetailClassAdakState(kelas: kelas);
 }
 
 class _DetailClassAdakState extends State<DetailClassAdak> {
 
-  String id,name;
-  _DetailClassAdakState({@required this.id,@required this.name});
+  Kelas kelas;
+  _DetailClassAdakState({@required this.kelas});
 
-  Stream<QuerySnapshot> _presensi;
-  SaveExcel saveExcel;
+  List<DataRow> _noItem = [];
+  SaveExcel _saveExcel;
 
   @override
   void initState() {
     super.initState();
 
-    _presensi = FirebaseFirestore.instance
-        .collection("presensi").where("id_class", isEqualTo: id)
-        .snapshots();
+    //---------------------------------revisi--------------------------------------//
+    // - data presensi diambil dari collection kelas (ok)
+    // - tambah judul makul dan pertemuan (ok)
+    // - format header dan data kehadiran no, nim, nama, status, tanggal (ok)
+    // - tambah jumlah hadir dan tidak hadir (ok)
 
-    _presensi.listen((data) {
-        if (data.docs.isNotEmpty){
-          List<String> header = ['No','Id','Student Email','Attend At'];
-          List<List<String>> body = [];
 
-          int no = 1;
-          for (DocumentSnapshot snap in data.docs) {
-            body.add(["${no}","${snap.id}","${snap.data()['email']}","${snap.data()['presensi'].toDate()}"]);
-            no++;
-          }
+      List<String> header = ['No','Nama','Status','Waktu'];
+      List<List<String>> body = [];
+      int jumlah_hadir = 0;
+      int jumlah_tidak_hadir = 0;
 
-          setState(() {
-            saveExcel = new SaveExcel(fileName : 'rekap_presensi_${name}', header: header, body : body);
-          });
+      for (Mahasiswa m in kelas.mahasiswa){
+        if (m.hadir){
+          jumlah_hadir++;
+        } else {
+          jumlah_tidak_hadir++;
         }
       }
-    );
-  }
+
+      int no = 1;
+      for (Mahasiswa m in kelas.mahasiswa) {
+        body.add(["${no}","${m.nama}","${ m.hadir ? "Hadir" : "tidak hadir" }","${m.waktu}"]);
+        no++;
+      }
+
+      setState(() {
+        _saveExcel = new SaveExcel(
+            fileName : 'rekap_presensi_${kelas.makul} pertemuan ${kelas.pertemuan}',
+            title: kelas.makul,
+            subtitle: "Pertemuan : ${kelas.pertemuan}",
+            header: header,
+            body : body,
+            end_title: "Jumlah Hadir : ${jumlah_hadir}",
+            end_subtitle: "Jumlah Tidak Hadir : ${jumlah_tidak_hadir}"
+        );
+      });
+
+      no = 1;
+      for (Mahasiswa m in kelas.mahasiswa) {
+        _noItem.add(DataRow(
+            onSelectChanged: (bool selected) {
+              if (selected) { }
+            },
+            cells: <DataCell>[
+              DataCell(Text("${no}")),
+              DataCell(Text("${m.nama}")),
+              DataCell(Text("${ m.hadir ? "Hadir ": "tidak hadir" }")),
+              DataCell(Text("${m.waktu}"))
+            ])
+        );
+        no++;
+      }
+    }
+
+    //-----------------------------------------------------------------------//
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +91,14 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
       appBar: AppBar(
         backgroundColor:Color.fromARGB(255, 32, 178, 170) ,
         title: Text(
-          'Detail Class ${name}',
+          '${kelas.makul} Pertemuan : ${kelas.pertemuan}',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (saveExcel != null) {
-            saveExcel.writeExcel();
+          if (_saveExcel != null) {
+            _saveExcel.writeExcel();
           }
         },
         child: Icon(Icons.download_rounded),
@@ -79,60 +114,37 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
                 height: 20.0,
               ),
               Center(
-                child: Text("List Present of class : ${name}"),
+                child: Text("List Present of : ${kelas.makul}"),
               ),
               Column(
                 children: [
-                  StreamBuilder<QuerySnapshot>(
-                      stream: _presensi,
-                      builder: (context, snapshot) {
-                        List<DataRow> noItem = [];
-                        if (snapshot.hasData){
-                          int no = 1;
-                          for (DocumentSnapshot snap in snapshot.data.docs) {
-                            noItem.add(DataRow(
-                                onSelectChanged: (bool selected) {
-                                  if (selected) { }
-                                },
-                                cells: <DataCell>[
-                                  DataCell(Text("${no}")),
-                                  DataCell(Text("${snap.id}")),
-                                  DataCell(Text("${snap.data()['email']}")),
-                                  DataCell(Text("${snap.data()['presensi'].toDate()}")),
-                                ])
-                            );
-                            no++;
-                          }
-                        }
-                        return SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: DataTable(showCheckboxColumn : false,columns: <DataColumn>[
-                                  DataColumn(
-                                      label: Text(
-                                          'No',
-                                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                                  ),
-                                  DataColumn(
-                                      label: Text(
-                                          ' Id',
-                                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                                  ),
-                                  DataColumn(
-                                      label: Text(
-                                          'Student Email',
-                                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                                  ),
-                                  DataColumn(
-                                      label: Text(
-                                          'Attend At',
-                                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
-                                  )
-                                ],rows: noItem)
-                            )
-                        );
-                      }
+                  SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(showCheckboxColumn : false,columns: <DataColumn>[
+                        DataColumn(
+                            label: Text(
+                                'No',
+                                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                        ),
+                        DataColumn(
+                            label: Text(
+                                ' Id',
+                                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                        ),
+                        DataColumn(
+                            label: Text(
+                                'Student Email',
+                                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                        ),
+                        DataColumn(
+                            label: Text(
+                                'Attend At',
+                                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                        )
+                      ],rows: _noItem)
+                    )
                   )
                 ],
               )

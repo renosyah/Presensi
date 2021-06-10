@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mypresensi/kelas/kelas.dart';
 
 // ini adalah kelas yang digunakan untuk menampilkan list presensi
 // yang telah dihadiri oleh mahasiswa
@@ -12,14 +13,17 @@ class ListPresensi extends StatefulWidget {
 
 class _ListPresensiState extends State<ListPresensi> {
 
-  Stream<QuerySnapshot> _presensi;
+  //---------------------------------revisi--------------------------------------//
+  // - data presensi diambil dari collection kelas (ok)
+
+  Stream<QuerySnapshot> _kelas;
 
   @override
   void initState() {
     super.initState();
 
-    _presensi  = FirebaseFirestore.instance
-        .collection("presensi")
+    _kelas = FirebaseFirestore.instance
+        .collection("kelas")
         .snapshots();
   }
 
@@ -32,21 +36,34 @@ class _ListPresensiState extends State<ListPresensi> {
           Column(
             children: [
               StreamBuilder<QuerySnapshot>(
-                  stream: _presensi,
+                  stream: _kelas,
                   builder: (context, snapshot) {
                     List<DataRow> noItem = [];
                     if (snapshot.hasData){
-                      log("${snapshot.data.docs.toString()}");
                       int no = 1;
                       for (DocumentSnapshot snap in snapshot.data.docs) {
+                        Kelas kelas = Kelas.fromJson(snap.data());
+                        int jumlah_hadir = 0;
+                        int jumlah_tidak_hadir = 0;
+
+                        for (Mahasiswa m in kelas.mahasiswa){
+                          if (m.hadir){
+                            jumlah_hadir++;
+                          } else {
+                            jumlah_tidak_hadir++;
+                          }
+                        }
+
                         noItem.add(DataRow(
                             onSelectChanged: (bool selected) {
                               if (selected) { }
                             },
                             cells: <DataCell>[
                               DataCell(Text("${no}")),
-                              DataCell(Text("${snap.id}")),
-                              DataCell(Text("${snap.data()['mata_kuliah']}")),
+                              DataCell(Text("${kelas.pertemuan}")),
+                              DataCell(Text("${kelas.makul}")),
+                              DataCell(Text("${jumlah_hadir}")),
+                              DataCell(Text("${jumlah_tidak_hadir}")),
                             ])
                         );
                         no++;
@@ -64,12 +81,22 @@ class _ListPresensiState extends State<ListPresensi> {
                               ),
                               DataColumn(
                                   label: Text(
-                                      ' Id',
+                                      'Pertemuan',
                                       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                               ),
                               DataColumn(
                                   label: Text(
-                                      'Class Name',
+                                      'Matakuliah',
+                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                              ),
+                              DataColumn(
+                                  label: Text(
+                                      'Hadir',
+                                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                              ),
+                              DataColumn(
+                                  label: Text(
+                                      'Tidak Hadir',
                                       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                               ),
                             ],rows: noItem)
@@ -84,3 +111,5 @@ class _ListPresensiState extends State<ListPresensi> {
     );
   }
 }
+
+//-----------------------------------------------------------------------//
