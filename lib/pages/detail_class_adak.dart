@@ -34,7 +34,7 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
     // - tambah jumlah hadir dan tidak hadir (ok)
 
 
-      List<String> header = ['No','Nama','Status','Waktu'];
+      List<String> header = ['No','Nim','Nama','Status','Waktu'];
       List<List<String>> body = [];
       int jumlah_hadir = 0;
       int jumlah_tidak_hadir = 0;
@@ -49,7 +49,7 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
 
       int no = 1;
       for (Mahasiswa m in kelas.mahasiswa) {
-        body.add(["${no}","${m.nama}","${ m.hadir ? "Hadir" : "tidak hadir" }","${m.waktu}"]);
+        body.add(["${no}","${m.nim}","${m.nama}","${ m.hadir ? "Hadir" : "tidak hadir" }","${m.waktu}"]);
         no++;
       }
 
@@ -73,6 +73,7 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
             },
             cells: <DataCell>[
               DataCell(Text("${no}")),
+              DataCell(Text("${m.nim}")),
               DataCell(Text("${m.nama}")),
               DataCell(Text("${ m.hadir ? "Hadir ": "tidak hadir" }")),
               DataCell(Text("${m.waktu}"))
@@ -130,17 +131,22 @@ class _DetailClassAdakState extends State<DetailClassAdak> {
                         ),
                         DataColumn(
                             label: Text(
-                                ' Id',
+                                'Nim',
                                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                         ),
                         DataColumn(
                             label: Text(
-                                'Student Email',
+                                'Nama',
                                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                         ),
                         DataColumn(
                             label: Text(
-                                'Attend At',
+                                'Status',
+                                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                        ),
+                        DataColumn(
+                            label: Text(
+                                'Waktu',
                                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                         )
                       ],rows: _noItem)
